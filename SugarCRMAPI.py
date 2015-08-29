@@ -22,7 +22,7 @@ class SugarCRMAPI(object):
 	}
 	url = None
 
-	def __init__(self, url, client_id, client_secret, user):
+	def __init__(self, url, client_id, client_secret):
 		self.url = url + self.REST10
 		self.client_id = client_id
 		self.client_secret = client_secret
@@ -181,11 +181,16 @@ class SugarCRMAPI(object):
 		#headers = self.get_headers()				
 		url = "{url}/{route}".format(url=self.url,route=url)
 		response = None
-		filename = unicodedata.normalize('NFKD', basename(file_content.name)).encode('ASCII', 'ignore')
-		m = MultipartEncoder(
-		fields={
-			field_name: (filename, file_content.read(), content_type)
-		})
+		file_name = basename(file_content.name).decode('unicode-escape')
+		filename = unicodedata.normalize('NFKD',file_name).encode('ASCII', 'ignore')
+		# m = MultipartEncoder(
+		# fields={
+		# 	field_name: (filename, file_content.read(), content_type)
+		# })
+		fields = {}
+		fields[field_name] = (filename, file_content.read(), content_type)
+		m = MultipartEncoder(fields=fields)
+
 		response = self.HTTP_METHODS['post'](url,data=m,headers={'Content-Type': m.content_type})
 		if response.status_code == 200:
 			return json.loads(response.text)
