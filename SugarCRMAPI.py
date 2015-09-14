@@ -190,8 +190,11 @@ class SugarCRMAPI(object):
 		fields = {}
 		fields[field_name] = (filename, file_content.read(), content_type)
 		m = MultipartEncoder(fields=fields)
+		print url
+		print content_type
 
 		response = self.HTTP_METHODS['post'](url,data=m,headers={'Content-Type': m.content_type})
+		print response.text
 		if response.status_code == 200:
 			return json.loads(response.text)
 		elif response.status_code == 401:
@@ -199,5 +202,5 @@ class SugarCRMAPI(object):
 			if refresh_result:
 				self.access_token = refresh_result['access_token']
 				self.refresh_token = refresh_result['refresh_token']
-				return self.upload(url, file_content)
+				return self.upload(url, file_content, content_type, field_name)
 			return None
